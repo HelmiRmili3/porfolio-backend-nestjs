@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { PortfolioModule } from './portfolio/portfolio.module';
+
 import { SupabaseService } from './supabase/supabase.service';
 import { ConfigModule } from '@nestjs/config';
 import { SupabaseModule } from './supabase/supabase.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { PortfolioModule } from './modules/portfolio/portfolio.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { ImageController } from './cloudinary/image.controller';
+import { CloudinaryService } from './cloudinary/cloudinary.service';
 
 @Module({
   imports: [
@@ -13,11 +15,14 @@ import { SupabaseModule } from './supabase/supabase.module';
       isGlobal: true,
       envFilePath: ['.env.development'],
     }),
+    MulterModule.register({
+      dest: './uploads',
+    }),
     AuthModule,
     PortfolioModule,
     SupabaseModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, SupabaseService],
+  controllers: [ImageController],
+  providers: [SupabaseService, CloudinaryService],
 })
 export class AppModule {}

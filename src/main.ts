@@ -1,16 +1,3 @@
-// // src/main.ts
-// import { NestFactory } from '@nestjs/core';
-// import { ConfigService } from '@nestjs/config';
-// import { AppModule } from './app.module';
-
-// async function bootstrap() {
-//   const app = await NestFactory.create(AppModule);
-//   const configService = app.get(ConfigService);
-//   const port = configService.get<number>('PORT') || 3000;
-//   await app.listen(port);
-// }
-// bootstrap();
-// src/main.ts
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
@@ -22,13 +9,22 @@ import { VersioningType } from '@nestjs/common';
 import fastifyCors from '@fastify/cors';
 import { registerGlobals } from './register.globals';
 import { configureSwagger } from './swagger.config';
+import multipart from '@fastify/multipart'; // Import multipart
 
 async function bootstrap() {
   // Create the NestJS application with Fastify
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter({ logger: true }),
+    new FastifyAdapter(),
   );
+
+  // Register the multipart plugin with configuration
+  await app.register(multipart, {
+    limits: {
+      fileSize: 50 * 1024 * 1024, // 50 MB file size limit (adjust as needed)
+    },
+    throwFileSizeLimit: true, // Throw an error if file size exceeds the limit
+  });
 
   // Get the ConfigService instance
   const configService = app.get(ConfigService);
@@ -36,8 +32,9 @@ async function bootstrap() {
   // Enable CORS
   app.register(fastifyCors, {
     origin: '*', // Allow requests from any origin (update this in production)
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
     credentials: true, // Allow credentials (e.g., cookies)
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allow these methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allow these headers
   });
 
   // Enable API versioning
@@ -56,7 +53,7 @@ async function bootstrap() {
   const port = configService.get<number>('PORT') || 4001;
 
   // Start the server
-  await app.listen(port, '0.0.0.0');
+  await app.listen(port);
   console.log(`Server is running on http://localhost:${port}`);
 }
 

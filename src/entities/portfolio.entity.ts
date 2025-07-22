@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 @Entity()
 export class Portfolio {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: String;
 
   // Header Section
   @Column()

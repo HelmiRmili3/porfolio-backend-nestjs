@@ -6,7 +6,7 @@ export function configureSwagger(app) {
     .setTitle('Portfolio API')
     .setDescription('API for managing portfolio data')
     .setVersion('1.0')
-    .addTag('portfolio')
+    // .addTag('portfolio')
     .addBearerAuth()
     .build();
 
